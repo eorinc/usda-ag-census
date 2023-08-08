@@ -208,6 +208,8 @@ write_csv(seeds, "table_26_seeds_forage_hay_silage.csv")
 
 # Table 41 ----
 # Land Use Practices
+
+#NOTE: for some reason the 2012 county-level data does not show up in this query
 data <- list()
 for (y in years) {
   data[[y]] <-
@@ -222,7 +224,13 @@ for (y in years) {
 
 land.use <- bind_rows(data) %>%
   filter(agg_level_desc %in% c("STATE", "COUNTY")) %>%
-  filter(class_desc=="LAND USE, CROPLAND" | class_desc=="LAND USE") %>%
+  filter(class_desc %in% c("LAND USE, CROPLAND", 
+                           "LAND USE") &
+           prodn_practice_desc %in% c("CONVENTIONAL TILLAGE", 
+                                      "CONSERVATION TILLAGE, NO-TILL", 
+                                      "CONSERVATION TILLAGE, (EXCL NO-TILL)", 
+                                      "COVER CROP PLANTED, (EXCL CRP)", 
+                                      "CONSERVATION EASEMENT")) %>%
   select(county_name, year, Value, unit_desc, source_desc, agg_level_desc, short_desc, domain_desc, domaincat_desc, commodity_desc, class_desc, prodn_practice_desc, statisticcat_desc) %>%
   arrange(county_name, year, unit_desc, short_desc)
 
@@ -244,14 +252,9 @@ for (y in years) {
 
 selected.practices <- bind_rows(data) %>%
   filter(agg_level_desc %in% c("STATE", "COUNTY")) %>%
-  filter(class_desc %in% c("ALLEY CROPPING & SILVAPASTURE", "ALL CLASSES", "LAND USE", "LAND USE, CROPLAND") &
+  filter(class_desc %in% c("ALLEY CROPPING & SILVAPASTURE", "ALL CLASSES") &
            prodn_practice_desc %in% c("ALL PRODUCTION PRACTICES", 
-                                      "ROTATIONAL OR MGMT INTENSIVE GRAZING", 
-                                      "CONVENTIONAL TILLAGE", 
-                                      "CONSERVATION TILLAGE, NO-TILL", 
-                                      "CONSERVATION TILLAGE, (EXCL NO-TILL)", 
-                                      "COVER CROP PLANTED, (EXCL CRP)", 
-                                      "CONSERVATION EASEMENT")) %>%
+                                      "ROTATIONAL OR MGMT INTENSIVE GRAZING")) %>%
   select(county_name, year, Value, unit_desc, source_desc, agg_level_desc, short_desc, domain_desc, domaincat_desc, commodity_desc, class_desc, prodn_practice_desc, statisticcat_desc) %>%
   arrange(county_name, year, unit_desc, short_desc)
 
