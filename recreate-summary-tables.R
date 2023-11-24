@@ -95,6 +95,27 @@ cropland <- bind_rows(data) %>%
 
 write_csv(bind_rows(land, farms, cropland), "table_8_farms_and_cropland.csv")
 
+# Pastureland
+data <- list()
+for (y in years) {
+  data[[y]] <- getQuickstat(
+    key = apikey,
+    year = y,
+    program = "CENSUS",
+    state = "MINNESOTA",
+    domain = "TOTAL",
+    commodity = "AG LAND"
+  )
+}
+
+pastureland <- bind_rows(data) %>%
+  filter((str_detect(short_desc, "PASTURELAND") | str_detect(short_desc, "WOODLAND, PASTURED") | str_detect(short_desc, "CROPLAND, PASTURED ONLY")) & !str_detect(short_desc, "EXCL CROPLAND & PASTURELAND")) %>%
+  filter(agg_level_desc %in% c("STATE", "COUNTY")) %>%
+  select(county_name, year, Value, unit_desc, source_desc, agg_level_desc, short_desc, domain_desc, domaincat_desc, commodity_desc, class_desc, prodn_practice_desc, statisticcat_desc) %>%
+  arrange(county_name, year, unit_desc, short_desc)
+
+write_csv(pastureland, "table_8_pastureland.csv")
+
 # Table 11 ----
 # Cattle and Calves
 data <- list()
